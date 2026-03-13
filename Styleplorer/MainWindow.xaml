@@ -1,0 +1,1727 @@
+﻿<Window x:Class="Styleplorer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Styleplorer"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:sys="clr-namespace:System.Windows.Controls;assembly=PresentationFramework"
+        mc:Ignorable="d"
+        Name="window" Title="MainWindow" Height="810" Width="860" MinHeight="200"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent" WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <!--#region Ресурсы-->
+        <Style x:Key="RectBorderStyle" TargetType="Rectangle">
+            <Setter Property="Focusable" Value="False" />
+            <Setter Property="Fill" Value="Transparent" />
+            <Setter Property="Tag" Value="{Binding RelativeSource={RelativeSource AncestorType=Window}}" />
+            <EventSetter Event="PreviewMouseLeftButtonDown" Handler="Resize"/>
+            <EventSetter Event="MouseEnter" Handler="DisplayResizeCursor"/>
+            <EventSetter Event="MouseLeave" Handler="ResetCursor"/>
+        </Style>
+        <!-- Шаблон для файлов -->
+        <DataTemplate x:Key="FileTemplate">
+            <Border Background="Transparent" Width="100">
+                <StackPanel ToolTipService.Placement="Mouse">
+                    <StackPanel.ToolTip>
+                        <ToolTip>
+                            <StackPanel>
+                                <TextBlock Text="File Information:" FontWeight="Bold"/>
+                                <TextBlock Text="{Binding Path}" />
+                            </StackPanel>
+                        </ToolTip>
+                    </StackPanel.ToolTip>
+                    <Image Source="{Binding Icon}" Width="100" Height="100" Stretch="Uniform"/>
+                    <TextBox IsReadOnly="True" IsHitTestVisible="False" Focusable="False" Background="Transparent" Foreground="{DynamicResource TextColorBrush}" BorderBrush="Transparent" BorderThickness="0" Text="{Binding Name}" Margin="5,0" TextWrapping="Wrap" TextAlignment="Center" />
+                </StackPanel>
+            </Border>
+        </DataTemplate>
+
+        <!-- Шаблон для папок -->
+        <!--<DataTemplate x:Key="FolderTemplate">
+            <Border Background="Transparent" Width="100">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0" Grid.RowSpan="2" ToolTipService.Placement="Mouse">
+                        <StackPanel.ToolTip>
+                            <ToolTip>
+                                <StackPanel>
+                                    <TextBlock Text="Folder Information:" FontWeight="Bold"/>
+                                    <TextBlock Text="{Binding Path}" />
+                                </StackPanel>
+                            </ToolTip>
+                        </StackPanel.ToolTip>
+                        <Grid>
+                            <Image Source="{Binding StandartFolderIcon1}" Width="100" Height="100" RenderTransformOrigin="0.5,0.5">
+                                <Image.RenderTransform>
+                                    <ScaleTransform ScaleX="1.3" ScaleY="1.3"/>
+                                </Image.RenderTransform>
+                            </Image>
+                            <Image Source="{Binding Icon}" Width="100" Height="100"/>
+                            <Image Source="{Binding GroupImage}" Width="24" Height="24" 
+                           HorizontalAlignment="Left" VerticalAlignment="Bottom" 
+                           Margin="10,0,0,10"/>
+                        </Grid>
+                        <Image Source="{Binding FileIcon1}" Margin="20,-110,0,0" Width="70" Height="70">
+                            <Image.RenderTransform>
+                                <TransformGroup>
+                                    <SkewTransform AngleY="10"/>
+                                </TransformGroup>
+                            </Image.RenderTransform>
+                            <Image.Clip>
+                                <RectangleGeometry Rect="15,0,60,60"/>
+                            </Image.Clip>
+                        </Image>
+                        <Image Source="{Binding FileIcon2}" Margin="-10,-110,0,0" Width="70" Height="70">
+                            <Image.RenderTransform>
+                                <TransformGroup>
+                                    <SkewTransform AngleY="15"/>
+                                </TransformGroup>
+                            </Image.RenderTransform>
+                            <Image.Clip>
+                                <RectangleGeometry Rect="27,0,60,60"/>
+                            </Image.Clip>
+                        </Image>
+                        <TextBox IsReadOnly="True" IsHitTestVisible="False" Focusable="False" 
+                         Background="Transparent" Foreground="{DynamicResource TextColorBrush}" 
+                         BorderBrush="Transparent" BorderThickness="0" Text="{Binding Name}" 
+                         Margin="5,0" TextWrapping="Wrap" TextAlignment="Center" />
+                    </StackPanel>
+
+                    <Image Grid.Row="0" Grid.RowSpan="2" Source="{Binding StandartFolderIcon2}" 
+                   Width="100" Height="100" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5">
+                        <Image.RenderTransform>
+                            <ScaleTransform ScaleX="1.3" ScaleY="1.3"/>
+                        </Image.RenderTransform>
+                    </Image>
+                </Grid>
+            </Border>
+        </DataTemplate>-->
+
+        <local:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
+        <DataTemplate x:Key="FolderTemplate">
+            <Border Background="Transparent" Width="100">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0" Grid.RowSpan="2" ToolTipService.Placement="Mouse">
+                        <StackPanel.ToolTip>
+                            <ToolTip>
+                                <StackPanel>
+                                    <TextBlock Text="Folder Information:" FontWeight="Bold"/>
+                                    <TextBlock Text="{Binding Path}" />
+                                </StackPanel>
+                            </ToolTip>
+                        </StackPanel.ToolTip>
+                        <Grid>
+                            <Image Source="{Binding StandartFolderIcon1}" Width="100" Height="100" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <Image.RenderTransform>
+                                    <ScaleTransform ScaleX="1.3" ScaleY="1.3"/>
+                                </Image.RenderTransform>
+                            </Image>
+                            <Image Source="{Binding Icon}" Width="100" Height="100" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <Image.RenderTransform>
+                                    <ScaleTransform ScaleX="1.3" ScaleY="1.3"/>
+                                </Image.RenderTransform>
+                            </Image>
+                            <!--<Image Source="{Binding GroupImage}" Width="24" Height="24" 
+                           HorizontalAlignment="Left" VerticalAlignment="Bottom" 
+                           Margin="10,0,0,10"/>-->
+                        </Grid>
+                        <Border Width="50" Height="70" Background="White" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="30,-110,0,0"
+                                Visibility="{Binding FileIcon1, Converter={StaticResource NullToVisibilityConverter}}">
+                            <Border.RenderTransform>
+                                <TransformGroup>
+                                    <SkewTransform AngleY="10"/>
+                                </TransformGroup>
+                            </Border.RenderTransform>
+                            <Image Source="{Binding FileIcon1}" Stretch="Fill" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+                        </Border>
+                        <Border Width="50" Height="70" Background="White" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,-110,0,0"
+                                Visibility="{Binding FileIcon2, Converter={StaticResource NullToVisibilityConverter}}">
+                            <Border.RenderTransform>
+                                <TransformGroup>
+                                    <SkewTransform AngleY="15"/>
+                                </TransformGroup>
+                            </Border.RenderTransform>
+                            <Image Source="{Binding FileIcon2}" Stretch="Fill" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+                        </Border>
+                        <TextBox IsReadOnly="True" IsHitTestVisible="False" Focusable="False" 
+                         Background="Transparent" Foreground="{DynamicResource TextColorBrush}" 
+                         BorderBrush="Transparent" BorderThickness="0" Text="{Binding Name}" 
+                         Margin="5,0" TextWrapping="Wrap" TextAlignment="Center" />
+                    </StackPanel>
+
+                    <!--<Image Grid.Row="0" Grid.RowSpan="2" Source="{Binding StandartFolderIcon2}" 
+                   Width="100" Height="100" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5">
+                        <Image.RenderTransform>
+                            <ScaleTransform ScaleX="1.3" ScaleY="1.3"/>
+                        </Image.RenderTransform>
+                    </Image>-->
+                    <Grid Grid.Row="0" Grid.RowSpan="2">
+                        <Image Source="{Binding StandartFolderIcon2}" 
+               Width="100" Height="100" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5">
+                            <Image.RenderTransform>
+                                <ScaleTransform ScaleX="1.3" ScaleY="1.3"/>
+                            </Image.RenderTransform>
+                        </Image>
+                    </Grid>
+
+                    <Grid Grid.Row="0" Grid.RowSpan="2">
+                        <Image Source="{Binding GroupImage}" Width="24" Height="24" 
+               HorizontalAlignment="Left" VerticalAlignment="Bottom" 
+               Margin="10,0,0,20"/>
+                    </Grid>
+                </Grid>
+            </Border>
+        </DataTemplate>
+
+
+        <!-- Шаблон для дисков -->
+        <DataTemplate x:Key="DriveTemplate">
+            <Border Background="Transparent" Width="270" Margin="5">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Image Source="{Binding Icon}" Width="80" Height="60" Margin="0,0,10,0" 
+                   Grid.Column="0" Grid.RowSpan="3" VerticalAlignment="Center" Stretch="Uniform"/>
+
+                    <TextBlock Text="{Binding Name}" 
+                       Grid.Column="1" Grid.Row="0"
+                       Foreground="{DynamicResource TextColorBrush}"
+                       TextWrapping="Wrap" 
+                       Margin="0,0,0,5"/>
+
+                    <ProgressBar Value="{Binding UsedSpacePercentage, Mode=OneWay}" 
+                         Grid.Column="1" Grid.Row="1"
+                         Minimum="0"
+                         Maximum="100" 
+                         Height="10" 
+                         Margin="0,0,0,5">
+                        <ProgressBar.Foreground>
+                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                <GradientStop Color="#FF3A7BD5" Offset="0"/>
+                                <GradientStop Color="#FF00D2FF" Offset="1"/>
+                            </LinearGradientBrush>
+                        </ProgressBar.Foreground>
+                    </ProgressBar>
+
+                    <TextBlock Text="{Binding FreeSpaceFormatted}" 
+                       Grid.Column="1" Grid.Row="2"
+                       Foreground="{DynamicResource TextColorBrush}" 
+                       FontSize="11"/>
+                </Grid>
+            </Border>
+        </DataTemplate>
+
+
+
+
+
+        <!-- Контекстное меню для файлов -->
+        <ContextMenu x:Key="FileContextMenu" Closed="ContextMenu_Closed">
+            <MenuItem Header="Открыть" Click="Open" />
+            <MenuItem Header="Удалить" Click="Delete" />
+            <MenuItem Header="Переименовать" Click="Rename" />
+            <MenuItem Header="Свойства" Click="Properties " />
+        </ContextMenu>
+
+        <!-- Контекстное меню для папок -->
+        <ContextMenu x:Key="FolderContextMenu" Closed="ContextMenu_Closed">
+            <MenuItem Header="Открыть" Click="Open" />
+            <MenuItem Header="Удалить" Click="Delete" />
+            <MenuItem Header="Переименовать" Click="Rename" />
+            <MenuItem Header="" x:Name="FavoriteMenuItem" Click="ToggleFavorite" />
+            <MenuItem Header="Группа" x:Name="GroupMenuItem" />
+            <MenuItem Header="Архивировать" Click="Archive_Click"/>
+            <MenuItem Header="Свойства" Click="Properties " />
+        </ContextMenu>
+
+        <!-- Контекстное меню для дисков -->
+        <ContextMenu x:Key="DriveContextMenu" Closed="ContextMenu_Closed">
+            <MenuItem Header="Открыть" Click="Open" />
+            <MenuItem Header="Удалить" Click="Delete" />
+            <MenuItem Header="Переименовать" Click="Rename" />
+            <MenuItem Header="Свойства" Click="Properties " />
+        </ContextMenu>
+
+        <!-- Контекстное меню для пустого места -->
+        <ContextMenu x:Key="EmptyContextMenu" Closed="ContextMenu_Closed">
+            <MenuItem Header="Обновить" Click="Refresh" />
+            <MenuItem Header="Вид">
+                <!--<MenuItem x:Name="HugeIcons" Header="Огромные значки" Click="ViewMenuItem_Click"/>-->
+                <!--<MenuItem x:Name="BigIcons" Header="Крупные значки" Click="ViewMenuItem_Click"/>-->
+                <MenuItem x:Name="NormalIcons" Header="Обычные значки" Click="ViewMenuItem_Click"/>
+                <!--<MenuItem x:Name="SmallIcons" Header="Мелкие значки" Click="ViewMenuItem_Click"/>-->
+                <!--<MenuItem x:Name="ViewList" Header="Список" Click="ViewMenuItem_Click"/>-->
+                <MenuItem x:Name="ViewTable" Header="Таблица" Click="ViewMenuItem_Click"/>
+                <!--<MenuItem Header="Плитка" Click="ViewMenuItem_Click"/>
+                <MenuItem Header="Содержимое" Click="ViewMenuItem_Click"/>-->
+            </MenuItem>
+        </ContextMenu>
+
+        <DataTemplate x:Key="ListView">
+            <StackPanel Orientation="Horizontal">
+                <Image Source="{Binding Icon}" Width="20" Height="20" />
+                <TextBlock Text="{Binding Name}" Margin="5,0" />
+            </StackPanel>
+        </DataTemplate>
+
+        <!-- Шаблон вида списка -->
+        <DataTemplate x:Key="ListViewTemplate">
+            <Border Background="Transparent">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.ToolTip>
+                        <ToolTip>
+                            <StackPanel>
+                                <TextBlock Text="File Information:" FontWeight="Bold"/>
+                                <TextBlock Text="{Binding Path}" />
+                            </StackPanel>
+                        </ToolTip>
+                    </Grid.ToolTip>
+                    <Image Source="{Binding Icon}" Width="24" Height="24" Margin="0,0,10,0"/>
+                    <TextBlock Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center" Foreground="{DynamicResource TextColorBrush}"/>
+                </Grid>
+            </Border>
+        </DataTemplate>
+
+        <!-- Шаблон вида таблицы -->
+        <DataTemplate x:Key="TableViewTemplate">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.ToolTip>
+                    <ToolTip>
+                        <StackPanel>
+                            <TextBlock Text="File Information:" FontWeight="Bold"/>
+                            <TextBlock Text="{Binding Path}" />
+                        </StackPanel>
+                    </ToolTip>
+                </Grid.ToolTip>
+                <Image Source="{Binding Icon}" Width="24" Height="24" Grid.Column="0" Margin="2"/>
+                <TextBlock Text="{Binding Name}" Grid.Column="1" VerticalAlignment="Center" Margin="2"/>
+                <TextBlock Text="{Binding Size}" Grid.Column="2" VerticalAlignment="Center" Margin="2"/>
+                <TextBlock Text="{Binding Type}" Grid.Column="3" VerticalAlignment="Center" Margin="2"/>
+                <TextBlock Text="{Binding DateChanged, StringFormat={}{0:dd.MM.yyyy HH:mm}}" Grid.Column="4" VerticalAlignment="Center" Margin="2"/>
+            </Grid>
+        </DataTemplate>
+
+        <Style x:Key="GridViewItemStyle" TargetType="{x:Type ListViewItem}">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ListViewItem}">
+                        <Border Background="{TemplateBinding Background}">
+                            <GridViewRowPresenter />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="Gray"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+
+
+
+
+        <local:FileFolderTemplateSelector x:Key="FileFolderTemplateSelector"
+                                      FileTemplate="{StaticResource FileTemplate}"
+                                      FolderTemplate="{StaticResource FolderTemplate}"
+                                      DriveTemplate="{StaticResource DriveTemplate}" />
+
+        <Style x:Key="BaseTabItemStyle" TargetType="TabItem">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Border Name="Border" BorderThickness="1,1,1,0" BorderBrush="{DynamicResource BorderColorBrush}" CornerRadius="4,4,0,0">
+                            <Grid>
+                                <TextBlock x:Name="HeaderText"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   Margin="12,2,12,2"
+                                   Text="{TemplateBinding Header}"
+                                   Foreground="{DynamicResource TextColorBrush}"/>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="Gray" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="False">
+                                <Setter TargetName="Border" Property="Background" Value="Transparent" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+
+        <Style x:Key="ClosableTabItemStyle" TargetType="TabItem">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Border Name="Border" BorderThickness="1,1,1,0" BorderBrush="{DynamicResource BorderColorBrush}" CornerRadius="4,4,0,0">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock x:Name="HeaderText"
+                                   Grid.Column="0"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Left"
+                                   Margin="12,2,12,2"
+                                   Text="{TemplateBinding Header}"
+                                   Foreground="{DynamicResource TextColorBrush}"/>
+                                <Button x:Name="CloseButton"
+                                Grid.Column="1"
+                                Content="X"
+                                Width="16" Height="16"
+                                Margin="0,0,5,0"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Right"
+                                BorderThickness="0"
+                                Background="Transparent"
+                                Foreground="{DynamicResource TextColorBrush}"
+                                Click="CloseTab_Click"
+                                Tag="{Binding RelativeSource={RelativeSource AncestorType=TabItem}}"/>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="Gray" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="False">
+                                <Setter TargetName="Border" Property="Background" Value="Transparent" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <local:TextTrimConverter x:Key="TextTrimConverter"/>
+        <!--<sys:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>-->
+        <!--<local:InverseBooleanConverter x:Key="InverseBooleanConverter"/>-->
+        <Style TargetType="Button" x:Key="PathElementStyle">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="2,0"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextColorBrush}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="Bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+            BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource SideMenuHighlightBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Storyboard x:Key="ShowConsole" Completed="ShowConsole_Completed">
+            <DoubleAnimation Storyboard.TargetName="ConsoleTranslate" 
+                         Storyboard.TargetProperty="Y"
+                         To="0" Duration="0:0:0.3"/>
+        </Storyboard>
+        <Storyboard x:Key="HideConsole">
+            <DoubleAnimation Storyboard.TargetName="ConsoleTranslate" 
+                         Storyboard.TargetProperty="Y"
+                         To="200" Duration="0:0:0.3"/>
+        </Storyboard>
+
+        <Storyboard x:Key="ShowConsole2">
+            <DoubleAnimation Storyboard.TargetName="ConsoleTranslate2" 
+                     Storyboard.TargetProperty="Y" 
+                     From="200" To="0" Duration="0:0:0.3">
+                <DoubleAnimation.EasingFunction>
+                    <CubicEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+        <Storyboard x:Key="HideConsole2">
+            <DoubleAnimation Storyboard.TargetName="ConsoleTranslate2" 
+                     Storyboard.TargetProperty="Y" 
+                     From="0" To="200" Duration="0:0:0.3">
+                <DoubleAnimation.EasingFunction>
+                    <CubicEase EasingMode="EaseIn"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+
+        <Style x:Key="TransparentButtonStyle" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextColorBrush}" />
+            <Setter Property="Height" Value="80"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderColorBrush}"/>
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="Bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource SideMenuHighlightBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ExpanderButtonStyle" TargetType="Expander">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextColorBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderColorBrush}"/>
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Expander">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Border x:Name="HeaderBorder" Background="{TemplateBinding Background}" 
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    Height="80">
+                                <Grid>
+                                    <ContentPresenter ContentSource="Header" 
+                                      HorizontalAlignment="Center" 
+                                      VerticalAlignment="Center"/>
+                                    <Button x:Name="ExpanderButton" 
+                                  Opacity="0"
+                                  Click="ExpanderButton_Click"/>
+                                </Grid>
+                            </Border>
+                            <Border x:Name="ContentBorder" Grid.Row="1" MaxHeight="0">
+                                <ContentPresenter x:Name="ExpanderContent" 
+                                  Content="{TemplateBinding Content}"/>
+                            </Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsExpanded" Value="True">
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="ContentBorder" 
+                                             Storyboard.TargetProperty="MaxHeight"
+                                             From="0" To="200" Duration="0:0:0.3"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="ContentBorder" 
+                                             Storyboard.TargetProperty="MaxHeight"
+                                             From="200" To="0" Duration="0:0:0.3"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="HeaderBorder" Property="Background" Value="{DynamicResource SideMenuHighlightBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="InnerExpanderButtonStyle" TargetType="Expander">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextColorBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderColorBrush}"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Expander">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Border x:Name="HeaderBorder" Background="{TemplateBinding Background}" 
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            Height="30">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Image x:Name="HeaderImage" Source="{Binding Image}" Grid.Column="0" Width="20" Height="20" Margin="5,0,5,0"/>
+                                    <ContentPresenter Grid.Column="1" ContentSource="Header" 
+                                      HorizontalAlignment="Left" 
+                                      VerticalAlignment="Center"/>
+                                    <Button x:Name="EditButton" Grid.Column="2" Content="🖉" 
+        Width="30" Height="30" BorderBrush="Transparent" FontSize="20"
+        VerticalAlignment="Center" HorizontalAlignment="Left"
+        Style="{StaticResource TransparentButtonStyle}"
+        Click="EditGroup_Click"
+        Panel.ZIndex="1"/>
+                                    <!--✎✐✏🖉-->
+                                    <Button x:Name="DeleteButton" Grid.Column="3" Content="✕" 
+                                    Width="20" Height="30" Margin="0,0,5,0" BorderBrush="Transparent"
+                                    VerticalAlignment="Center" HorizontalAlignment="Left"
+                                    Style="{StaticResource TransparentButtonStyle}"
+                                    Click="DeleteGroup_Click"
+                                    Panel.ZIndex="1"/>
+                                    <Button x:Name="ExpanderButton" 
+                            Grid.ColumnSpan="3"
+                            Opacity="0"
+                            Click="ExpanderButton_Click"/>
+                                </Grid>
+                            </Border>
+                            <Border x:Name="ContentBorder" Grid.Row="1" MaxHeight="0">
+                                <ContentPresenter x:Name="ExpanderContent" 
+                                          Content="{TemplateBinding Content}"/>
+                            </Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsExpanded" Value="True">
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="ContentBorder" 
+                                                     Storyboard.TargetProperty="MaxHeight"
+                                                     From="0" To="100" Duration="0:0:0.3">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <ExponentialEase EasingMode="EaseOut" Exponent="5"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="ContentBorder" 
+                                                     Storyboard.TargetProperty="MaxHeight"
+                                                     To="0" Duration="0:0:0.3">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <ExponentialEase EasingMode="EaseIn" Exponent="5"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="HeaderBorder" Property="Background" Value="{DynamicResource SideMenuHighlightBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <DataTemplate x:Key="GroupListViewTemplate">
+            <Border Background="Transparent">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.ToolTip>
+                        <ToolTip>
+                            <StackPanel>
+                                <TextBlock Text="File Information:" FontWeight="Bold"/>
+                                <TextBlock Text="{Binding Path}" />
+                            </StackPanel>
+                        </ToolTip>
+                    </Grid.ToolTip>
+                    <Image Source="{Binding Icon}" Grid.Column="0" Width="24" Height="24" Margin="0,0,10,0"/>
+                    <TextBlock Grid.Column="1" Text="{Binding Name}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" HorizontalAlignment="Stretch" Foreground="{DynamicResource TextColorBrush}"/>
+                    <Button Content="✕" Grid.Column="2" Width="24" Height="24" BorderBrush="Transparent"
+                            VerticalAlignment="Center" HorizontalAlignment="Right"
+Style="{StaticResource TransparentButtonStyle}"
+Click="DeleteItem_Click"/>
+                </Grid>
+            </Border>
+        </DataTemplate>
+
+        <Style x:Key="MenuButtonStyle" TargetType="Button" BasedOn="{StaticResource TransparentButtonStyle}">
+            <Setter Property="Height" Value="50"/>
+            <Setter Property="Margin" Value="5,2"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="Bd" Background="{TemplateBinding Background}" CornerRadius="5">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Image Source="{Binding Icon}" Width="20" Height="20" Margin="10,0,0,0"/>
+                                <ContentPresenter Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource SideMenuHighlightBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ExpanderStyle" TargetType="Expander" BasedOn="{StaticResource ExpanderButtonStyle}">
+            <Setter Property="Margin" Value="5,2"/>
+        </Style>
+
+        <Style x:Key="ListViewStyle" TargetType="ListView">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
+        </Style>
+
+        <Style x:Key="AddGroupButtonStyle" TargetType="Button" BasedOn="{StaticResource TransparentButtonStyle}">
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Margin" Value="5,2"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+
+        <Style x:Key="DropBoxButtonStyle" TargetType="Button" BasedOn="{StaticResource TransparentButtonStyle}">
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Width" Value="40"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="Bd" Background="{TemplateBinding Background}" CornerRadius="20">
+                            <Image Source="pack://application:,,,/Styleplorer;component/Resources/DropBoxLogo.png" RenderTransformOrigin="0.5,0.5">
+                                <Image.RenderTransform>
+                                    <ScaleTransform ScaleX="1.5" ScaleY="1.5"/>
+                                </Image.RenderTransform>
+                            </Image>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource SideMenuHighlightBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!--#endregion-->
+
+        <!--#region Цвета-->
+        <SolidColorBrush x:Key="PrimaryBackgroundBrush" Color="{DynamicResource PrimaryBackgroundColor}"/>
+        <SolidColorBrush x:Key="SecondaryBackgroundBrush" Color="{DynamicResource SecondaryBackgroundColor}"/>
+        <SolidColorBrush x:Key="AccentBrush" Color="{DynamicResource AccentColor}" />
+        <SolidColorBrush x:Key="Shade1" Color="{DynamicResource Shade1}"/>
+        <SolidColorBrush x:Key="Shade2" Color="{DynamicResource Shade2}"/>
+        <SolidColorBrush x:Key="Shade3" Color="{DynamicResource Shade3}"/>
+        <SolidColorBrush x:Key="Shade4" Color="{DynamicResource Shade4}"/>
+        <SolidColorBrush x:Key="Shade5" Color="{DynamicResource Shade5}"/>
+
+        <SolidColorBrush x:Key="DefaultMainGridBrush" Color="#313338"/>
+        <SolidColorBrush x:Key="DefaultTopPanelBrush" Color="#232428"/>
+        <SolidColorBrush x:Key="DefaultBottomPanelBrush" Color="#232428"/>
+        <SolidColorBrush x:Key="DefaultRectangleBrush" Color="#1e1f22"/>
+        <SolidColorBrush x:Key="DefaultSideMenuBrush" Color="#2b2d31"/>
+        <SolidColorBrush x:Key="DefaultTextColorBrush" Color="White"/>
+        <SolidColorBrush x:Key="DefaultBorderColorBrush" Color="DimGray"/>
+        <SolidColorBrush x:Key="DefaultWindowBorderColorBrush" Color="#1a1b1e"/>
+        <Color x:Key="DefaultRectangleBaseColor">#FF64B4FA</Color>
+        <Color x:Key="DefaultFolderColor">Transparent</Color>
+
+        <SolidColorBrush x:Key="MainGridBrush" Color="#313338"/>
+        <SolidColorBrush x:Key="TopPanelBrush" Color="#232428"/>
+        <SolidColorBrush x:Key="BottomPanelBrush" Color="#232428"/>
+        <SolidColorBrush x:Key="RectangleBrush" Color="#1e1f22"/>
+        <SolidColorBrush x:Key="SideMenuBrush" Color="#2b2d31"/>
+        <SolidColorBrush x:Key="TextColorBrush" Color="White"/>
+        <SolidColorBrush x:Key="BorderColorBrush" Color="DimGray"/>
+        <SolidColorBrush x:Key="WindowBorderColorBrush" Color="#1a1b1e"/>
+        <Color x:Key="RectangleBaseColor">#FF64B4FA</Color>
+        <Color x:Key="FolderColor">Transparent</Color>
+
+        <SolidColorBrush x:Key="RectangleHighlightBrush" Color="Gray" />
+        <SolidColorBrush x:Key="SideMenuHighlightBrush" Color="Gray" />
+        <!--#endregion-->
+    </Window.Resources>
+    <Grid>
+        <Rectangle Panel.ZIndex="5" Fill="{DynamicResource RectangleBrush}" MouseLeftButtonDown="captionRectangle_MouseLeftButtonDown" Name="captionRectangle" Height="30" VerticalAlignment="Top">
+            <!--<Rectangle.Fill>
+                <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
+                    <GradientStop Color="#1d1f20" Offset="0"/> 
+            
+                </LinearGradientBrush>
+            </Rectangle.Fill>-->
+        </Rectangle>
+
+        <!--#region Границы окна-->
+        <!-- Прямоугольник для коллизии -->
+        <Rectangle x:Name="ResizeW"
+               Panel.ZIndex="200"
+               Width="10"
+               Fill="Transparent"
+               HorizontalAlignment="Left"
+               Style="{StaticResource RectBorderStyle}" />
+        <!-- Прямоугольник для отображения -->
+        <Rectangle x:Name="ResizeW_Display"
+               Panel.ZIndex="21"
+               Width="1.5"
+               Fill="{DynamicResource WindowBorderColorBrush}"
+               HorizontalAlignment="Left"/>
+
+        <!-- Прямоугольник для коллизии -->
+        <Rectangle x:Name="ResizeE"
+               Panel.ZIndex="200"
+               Width="10"
+               Fill="Transparent"
+               HorizontalAlignment="Right"
+               Style="{StaticResource RectBorderStyle}" Grid.Column="2"/>
+        <!-- Прямоугольник для отображения -->
+        <Rectangle x:Name="ResizeE_Display"
+               Panel.ZIndex="21"
+               Width="1.5"
+               Fill="{DynamicResource WindowBorderColorBrush}"
+               HorizontalAlignment="Right" Grid.Column="2"/>
+
+        <!-- Прямоугольник для коллизии -->
+        <Rectangle x:Name="ResizeN"
+               Grid.ColumnSpan="2"
+               Panel.ZIndex="200"
+               Height="10"
+               Fill="Transparent"
+               VerticalAlignment="Top"
+               Style="{StaticResource RectBorderStyle}" />
+        <!-- Прямоугольник для отображения -->
+        <Rectangle x:Name="ResizeN_Display"
+               Grid.ColumnSpan="2"
+               Panel.ZIndex="21"
+               Height="1"
+               Fill="{DynamicResource WindowBorderColorBrush}"
+               VerticalAlignment="Top" />
+
+        <!-- Прямоугольник для коллизии -->
+        <Rectangle x:Name="ResizeS"
+               Grid.ColumnSpan="2"
+               Panel.ZIndex="200"
+               Height="5"
+               Fill="Transparent"
+               VerticalAlignment="Bottom"
+               Style="{StaticResource RectBorderStyle}" />
+        <!-- Прямоугольник для отображения -->
+        <Rectangle x:Name="ResizeS_Display"
+               Grid.ColumnSpan="2"
+               Panel.ZIndex="21"
+               Height="1.5"
+               Fill="{DynamicResource WindowBorderColorBrush}"
+               VerticalAlignment="Bottom" />
+        <!--  Corners  -->
+        <Rectangle Name="ResizeNW"
+                   Panel.ZIndex="300"
+Width="7"
+Height="7"
+HorizontalAlignment="Left"
+VerticalAlignment="Top"
+Style="{StaticResource RectBorderStyle}" />
+        <Rectangle Name="ResizeSE" Grid.Column="1"
+                   Panel.ZIndex="300"
+Width="7"
+Height="7"
+HorizontalAlignment="Right"
+VerticalAlignment="Bottom"
+Style="{StaticResource RectBorderStyle}" />
+        <Rectangle Name="ResizeNE" Grid.Column="1"
+                   Panel.ZIndex="300"
+Width="7"
+Height="7"
+HorizontalAlignment="Right"
+VerticalAlignment="Top"
+Style="{StaticResource RectBorderStyle}" />
+        <Rectangle Name="ResizeSW"
+                   Panel.ZIndex="300"
+Width="7"
+Height="7"
+HorizontalAlignment="Left"
+VerticalAlignment="Bottom"
+Style="{StaticResource RectBorderStyle}" />
+        <!--#endregion-->
+
+        <!--#region Кнопки-->
+        <Button Name="closeBnt" Panel.ZIndex="6" PreviewMouseLeftButtonUp="CloseClick" Height="29" HorizontalAlignment="Right" VerticalAlignment="Top" Width="45" Background="Transparent">
+            <Button.Template>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bd" Background="Transparent">
+                        <Path x:Name="Pt" Data="M0,0 M0.2,0.2 L 0.8,0.8 M0.2,0.8 L0.8,0.2 M1,1"
+              Stretch="Uniform" Stroke="{DynamicResource TextColorBrush}" StrokeThickness="1" Margin="6,3,5,3"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="Red"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Button.Template>
+        </Button>
+        <Button x:Name="MaximizeBtn" Panel.ZIndex="6" PreviewMouseLeftButtonUp="MaximizeWindow_Click" Height="29" HorizontalAlignment="Right" VerticalAlignment="Top" Width="45" Background="Transparent" Margin="0,0,46,0">
+            <Button.Template>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border x:Name="Bd" Background="Transparent">
+                        <Rectangle Width="10" Height="10" Stroke="{DynamicResource TextColorBrush}" StrokeThickness="1.2"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource RectangleHighlightBrush}"/>
+                            <!--#FF4169E1-->
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Button.Template>
+        </Button>
+        <Button x:Name="MinimizeBtn" Panel.ZIndex="6" PreviewMouseLeftButtonUp="MinimizeWindow_Click" Height="29" HorizontalAlignment="Right" VerticalAlignment="Top" Width="45" Background="Transparent" Margin="0,0,93,0">
+            <Button.Template>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border x:Name="Bd" Background="Transparent">
+                        <Line x:Name="Pt" Width="13" Height="10" Stroke="{DynamicResource TextColorBrush}" StrokeThickness="2" X1="0" Y1="10" X2="13" Y2="10"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource RectangleHighlightBrush}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Button.Template>
+        </Button>
+        <!--#endregion-->
+
+        <Grid x:Name="MainGrid" Margin="0,30,0,0" Background="{DynamicResource MainGridBrush}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="250" />
+                <ColumnDefinition x:Name="FirstColumn" Width="*"/>
+                <ColumnDefinition Width="0" />
+                <ColumnDefinition x:Name="SecondColumn" Width="0"/>
+            </Grid.ColumnDefinitions>
+
+            <!--<Border x:Name="SideMenu" Background="{DynamicResource SideMenuBrush}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BorderBrush="{DynamicResource BorderColorBrush}" BorderThickness="0,0,1,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="150"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Button Grid.Row="1" x:Name="MainButton" Background="{DynamicResource SideMenuHighlightBrush}" Content="Главная" Style="{StaticResource TransparentButtonStyle}" Click="MainButton_Click"/>
+
+                    <Grid Grid.Row="2">
+                        <StackPanel x:Name="ExpanderContainer">
+                            <Expander Header="Избранное" Style="{StaticResource ExpanderButtonStyle}" Expanded="Expander_Expanded">
+                                <ListView x:Name="FavoritesListView" Height="200" Background="Transparent" BorderThickness="0" ItemTemplate="{StaticResource GroupListViewTemplate}" PreviewMouseLeftButtonUp="FavoritesListView_PreviewMouseLeftButtonUp">
+                                    <ListView.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <VirtualizingStackPanel/>
+                                        </ItemsPanelTemplate>
+                                    </ListView.ItemsPanel>
+                                </ListView>
+                            </Expander>
+                            <Expander Header="Группы" Style="{StaticResource ExpanderButtonStyle}" Expanded="Expander_Expanded">
+                                <ScrollViewer x:Name="GroupScrollViewer" VerticalScrollBarVisibility="Auto">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <ItemsControl x:Name="GroupsListView" Background="Transparent" BorderThickness="0">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Expander Header="{Binding Name}" Style="{StaticResource InnerExpanderButtonStyle}" Expanded="Expander_Expanded">
+                                                        <ListView ItemsSource="{Binding Items}" Background="Transparent" BorderThickness="0" ItemTemplate="{StaticResource GroupListViewTemplate}" PreviewMouseLeftButtonUp="FavoritesListView_PreviewMouseLeftButtonUp">
+                                                            <ListView.ItemsPanel>
+                                                                <ItemsPanelTemplate>
+                                                                    <VirtualizingStackPanel/>
+                                                                </ItemsPanelTemplate>
+                                                            </ListView.ItemsPanel>
+                                                        </ListView>
+                                                    </Expander>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <VirtualizingStackPanel/>
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+                                        </ItemsControl>
+                                        <Button Grid.Row="1" Height="35" FontSize="16" Content="+ Создать группу" BorderBrush="Transparent" Style="{StaticResource TransparentButtonStyle}" Click="AddGroupButton_Click"/>
+                                        <Grid Grid.Row="1" x:Name="AddGroupPanel" Visibility="Collapsed">
+                                            <Border Background="Black" CornerRadius="5" Width="Auto" Height="Auto" Padding="10">
+                                                <StackPanel>
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                        </Grid.ColumnDefinitions>
+
+                                                        <Image x:Name="GroupImage" Stretch="Fill" Source="pack://application:,,,/Styleplorer;component/Resources/GroupFolderIcon.png" Grid.Column="0" Width="30" Height="30" Margin="0,0,5,0" MouseLeftButtonUp="GroupImage_MouseLeftButtonUp"/>
+                                                        <TextBox x:Name="GroupNameTextBox" Grid.Column="1" Text="NewGroup" MaxLength="20" CaretBrush="{DynamicResource TextColorBrush}" Foreground="{DynamicResource TextColorBrush}" Background="Transparent" PreviewTextInput="GroupNameTextBox_PreviewTextInput"/>
+                                                    </Grid>
+
+                                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+                                                        <Button x:Name="CreateGroupButton" Content="Создать" Margin="0,0,10,0" Height="25" Click="CreateGroupButton_Click" Style="{StaticResource TransparentButtonStyle}"/>
+                                                        <Button Content="Отмена" Height="25" Click="CancelButton_Click" Style="{StaticResource TransparentButtonStyle}"/>
+                                                    </StackPanel>
+                                                </StackPanel>
+                                            </Border>
+                                        </Grid>
+                                    </Grid>
+                                </ScrollViewer>
+                            </Expander>
+                            <Button x:Name="ThemesButton" Content="Темы" Style="{StaticResource TransparentButtonStyle}" Click="ThemesButton_Click"/>
+                            <Button x:Name="SettingsButton" Content="Настройки" Style="{StaticResource TransparentButtonStyle}" Click="SettingsButton_Click"/>
+                            <Button x:Name="DropBox" Content="DropBox" Style="{StaticResource TransparentButtonStyle}"/>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </Border>-->
+
+            <Border x:Name="SideMenu" Background="{DynamicResource SideMenuBrush}" HorizontalAlignment="Left" Width="250" VerticalAlignment="Stretch" BorderBrush="{DynamicResource BorderColorBrush}" BorderThickness="0,0,1,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Верхняя часть меню -->
+                    <StackPanel Grid.Row="0">
+                        <Image x:Name="BigLogoImage" Source="pack://application:,,,/Styleplorer;component/Resources/BigLogo.png"/>
+                        <Button x:Name="MainButton" BorderThickness="0,1,0,0" Content="Главная" Style="{StaticResource TransparentButtonStyle}" Click="MainButton_Click"/>
+                        <Button x:Name="ThemesButton" BorderThickness="0,1,0,0" Content="Темы" Style="{StaticResource TransparentButtonStyle}" Click="ThemesButton_Click"/>
+                        <Button x:Name="SettingsButton" BorderThickness="0,1,0,0" Content="Настройки" Style="{StaticResource TransparentButtonStyle}" Click="SettingsButton_Click"/>
+                    </StackPanel>
+
+                    <!-- Средняя часть меню с экспандерами -->
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                        <StackPanel x:Name="ExpanderContainer">
+                            <Expander Header="Избранное" BorderThickness="0,1,0,0" Style="{StaticResource ExpanderButtonStyle}" Expanded="Expander_Expanded">
+                                <ListView x:Name="FavoritesListView" MaxHeight="200" Background="Transparent" BorderThickness="0" ItemTemplate="{StaticResource GroupListViewTemplate}" PreviewMouseLeftButtonUp="FavoritesListView_PreviewMouseLeftButtonUp">
+                                    <ListView.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <VirtualizingStackPanel/>
+                                        </ItemsPanelTemplate>
+                                    </ListView.ItemsPanel>
+                                </ListView>
+                            </Expander>
+                            <Expander Header="Группы" BorderThickness="0,1,0,1" Style="{StaticResource ExpanderButtonStyle}" Expanded="Expander_Expanded">
+                                <ScrollViewer x:Name="GroupScrollViewer" VerticalScrollBarVisibility="Auto" MaxHeight="300">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <ItemsControl x:Name="GroupsListView" Background="Transparent" BorderThickness="0">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Expander Header="{Binding Name}" Style="{StaticResource InnerExpanderButtonStyle}" Expanded="Expander_Expanded">
+                                                        <ListView ItemsSource="{Binding Items}" Background="Transparent" BorderThickness="0" ItemTemplate="{StaticResource GroupListViewTemplate}" PreviewMouseLeftButtonUp="FavoritesListView_PreviewMouseLeftButtonUp" MaxHeight="150">
+                                                            <ListView.ItemsPanel>
+                                                                <ItemsPanelTemplate>
+                                                                    <VirtualizingStackPanel/>
+                                                                </ItemsPanelTemplate>
+                                                            </ListView.ItemsPanel>
+                                                        </ListView>
+                                                    </Expander>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <VirtualizingStackPanel/>
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+                                        </ItemsControl>
+                                        <Button Grid.Row="1" Height="35" FontSize="14" Content="+ Создать группу" Style="{StaticResource TransparentButtonStyle}" Click="AddGroupButton_Click"/>
+                                        <Grid Grid.Row="2" x:Name="AddGroupPanel" Visibility="Collapsed">
+                                            <Border Background="#33000000" CornerRadius="5" Padding="10">
+                                                <StackPanel>
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                        </Grid.ColumnDefinitions>
+
+                                                        <Image x:Name="GroupImage" Stretch="Fill" Source="pack://application:,,,/Styleplorer;component/Resources/GroupFolderIcon.png" Grid.Column="0" Width="24" Height="24" Margin="0,0,5,0" MouseLeftButtonUp="GroupImage_MouseLeftButtonUp"/>
+                                                        <TextBox x:Name="GroupNameTextBox" Grid.Column="1" Text="NewGroup" MaxLength="20" CaretBrush="{DynamicResource TextColorBrush}" Foreground="{DynamicResource TextColorBrush}" Background="Transparent" PreviewTextInput="GroupNameTextBox_PreviewTextInput"/>
+                                                    </Grid>
+
+                                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+                                                        <Button x:Name="CreateGroupButton" Content="Создать" Margin="0,0,10,0" Height="25" Click="CreateGroupButton_Click" Style="{StaticResource TransparentButtonStyle}"/>
+                                                        <Button Content="Отмена" Height="25" Click="CancelButton_Click" Style="{StaticResource TransparentButtonStyle}"/>
+                                                    </StackPanel>
+                                                </StackPanel>
+                                            </Border>
+                                        </Grid>
+                                    </Grid>
+                                </ScrollViewer>
+                            </Expander>
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <!-- Нижняя часть меню -->
+                    <Button x:Name="DropBox" Grid.Row="2" Content="DropBox" Style="{StaticResource DropBoxButtonStyle}"/>
+                </Grid>
+            </Border>
+
+
+            <Grid x:Name="ThemesGrid" Grid.Column="1" Visibility="Hidden" Panel.ZIndex="1000" Background="{DynamicResource MainGridBrush}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <StackPanel Grid.Row="0" Grid.Column="0" Margin="10,10,0,0">
+                            <CheckBox x:Name="WallpaperColorCheckBox" Content="Синхронизация цветов обоев" Foreground="{DynamicResource TextColorBrush}"
+                  Checked="WallpaperColorCheckBox_Checked"
+                  Unchecked="WallpaperColorCheckBox_Unchecked"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                <TextBlock Text="Выберите монитор:" Background="Transparent" Foreground="{DynamicResource TextColorBrush}" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                <ComboBox x:Name="MonitorComboBox" Width="150" IsEnabled="False" SelectionChanged="MonitorComboBox_SelectionChanged"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                <TextBlock Text="Выберите тему:" Background="Transparent" Foreground="{DynamicResource TextColorBrush}" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                <ComboBox x:Name="DarkLightTheme" Width="150" SelectionChanged="DarkLightTheme_SelectionChanged">
+                                    <ComboBoxItem Name="LightTheme" Content="Светлая тема"/>
+                                    <ComboBoxItem Name="DarkTheme" Content="Тёмная тема"/>
+                                </ComboBox>
+                            </StackPanel>
+                            <CheckBox x:Name="SetSelectedThemeCheckBox" Margin="0,10,0,0" Content="Использовать выбранную тему" Foreground="{DynamicResource TextColorBrush}"
+                  Checked="SetSelectedThemeCheckBox_Checked"
+                  Unchecked="SetSelectedThemeCheckBox_Unchecked"/>
+                        </StackPanel>
+
+                        <ListBox x:Name="themeListBox" Grid.Row="1" IsEnabled="False" Margin="10,20,13,0" Background="Transparent" BorderBrush="{DynamicResource BorderColorBrush}" SelectionChanged="ThemeListBox_SelectionChanged">
+                            <ListBox.Template>
+                                <ControlTemplate TargetType="{x:Type ListBox}">
+                                    <Border Background="Transparent" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                                        <ScrollViewer Focusable="false" Padding="{TemplateBinding Padding}">
+                                            <ItemsPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                                        </ScrollViewer>
+                                    </Border>
+                                </ControlTemplate>
+                            </ListBox.Template>
+                            <ListBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel Orientation="Horizontal" Margin="0,10,0,10"/>
+                                </ItemsPanelTemplate>
+                            </ListBox.ItemsPanel>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Width="150" Height="150">
+                                        <Image Source="{Binding Preview}" Stretch="UniformToFill"/>
+                                        <TextBlock Text="{Binding Name}" VerticalAlignment="Bottom" HorizontalAlignment="Center" 
+                           Foreground="{DynamicResource TextColorBrush}" FontWeight="Bold" Margin="0,0,0,10"/>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,5,5,0">
+                                            <Button x:Name="EditButton" Click="EditButton_Click" Width="24" Height="24" Margin="0,0,5,0">
+                                                <Button.Style>
+                                                    <Style TargetType="Button">
+                                                        <Setter Property="Background" Value="Transparent"/>
+                                                        <Setter Property="Foreground" Value="{DynamicResource TextColorBrush}"/>
+                                                        <Setter Property="BorderBrush" Value="Transparent"/>
+                                                        <Setter Property="Template">
+                                                            <Setter.Value>
+                                                                <ControlTemplate TargetType="Button">
+                                                                    <ContentPresenter />
+                                                                </ControlTemplate>
+                                                            </Setter.Value>
+                                                        </Setter>
+                                                    </Style>
+                                                </Button.Style>
+                                                <Button.Content>
+                                                    <TextBlock Text="🖉" FontSize="16"/>
+                                                </Button.Content>
+                                            </Button>
+
+                                            <Button x:Name="DeleteButton" Click="DeleteButton_Click" Width="24" Height="24">
+                                                <Button.Style>
+                                                    <Style TargetType="Button">
+                                                        <Setter Property="Background" Value="Transparent"/>
+                                                        <Setter Property="BorderBrush" Value="Transparent"/>
+                                                        <Setter Property="Template">
+                                                            <Setter.Value>
+                                                                <ControlTemplate TargetType="Button">
+                                                                    <ContentPresenter />
+                                                                </ControlTemplate>
+                                                            </Setter.Value>
+                                                        </Setter>
+                                                    </Style>
+                                                </Button.Style>
+                                                <Button.Content>
+                                                    <Path
+    Stroke="{DynamicResource TextColorBrush}"
+    StrokeThickness="2"
+    Fill="Transparent">
+                                                        <Path.Data>
+                                                            <PathGeometry>
+                                                                <PathFigure StartPoint="5,8">
+                                                                    <LineSegment Point="7,20" />
+                                                                    <LineSegment Point="17,20" />
+                                                                    <LineSegment Point="19,8" />
+                                                                    <LineSegment Point="5,8" />
+                                                                </PathFigure>
+                                                                <PathFigure StartPoint="3,6">
+                                                                    <LineSegment Point="21,6" />
+                                                                </PathFigure>
+                                                                <PathFigure StartPoint="8,4">
+                                                                    <LineSegment Point="16,4" />
+                                                                </PathFigure>
+                                                                <PathFigure StartPoint="9,8">
+                                                                    <LineSegment Point="9,18" />
+                                                                </PathFigure>
+                                                                <PathFigure StartPoint="12,8">
+                                                                    <LineSegment Point="12,18" />
+                                                                </PathFigure>
+                                                                <PathFigure StartPoint="15,8">
+                                                                    <LineSegment Point="15,18" />
+                                                                </PathFigure>
+                                                            </PathGeometry>
+                                                        </Path.Data>
+                                                    </Path>
+                                                </Button.Content>
+                                            </Button>
+                                        </StackPanel>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem">
+                                    <Setter Property="Background" Value="Transparent"/>
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                    <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+                                    <Setter Property="Margin" Value="10,0,0,0"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="ListBoxItem">
+                                                <Border x:Name="Border" BorderThickness="2" BorderBrush="{DynamicResource BorderBrush}">
+                                                    <ContentPresenter/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsSelected" Value="True">
+                                                        <Setter TargetName="Border" Property="BorderBrush" Value="Blue"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+                                    <Setter Property="RenderTransform">
+                                        <Setter.Value>
+                                            <ScaleTransform ScaleX="1" ScaleY="1"/>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Trigger.EnterActions>
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <DoubleAnimation Storyboard.TargetProperty="RenderTransform.(ScaleTransform.ScaleX)" 
+                                             To="1.1" Duration="0:0:0.2"/>
+                                                        <DoubleAnimation Storyboard.TargetProperty="RenderTransform.(ScaleTransform.ScaleY)" 
+                                             To="1.1" Duration="0:0:0.2"/>
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </Trigger.EnterActions>
+                                            <Trigger.ExitActions>
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <DoubleAnimation Storyboard.TargetProperty="RenderTransform.(ScaleTransform.ScaleX)" 
+                                             To="1" Duration="0:0:0.2"/>
+                                                        <DoubleAnimation Storyboard.TargetProperty="RenderTransform.(ScaleTransform.ScaleY)" 
+                                             To="1" Duration="0:0:0.2"/>
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </Trigger.ExitActions>
+                                        </Trigger>
+                                        <Trigger Property="IsEnabled" Value="False">
+                                            <Setter Property="Background" Value="Transparent"/>
+                                            <Setter Property="Opacity" Value="0.8"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                        </ListBox>
+                        <Button x:Name="CreateNewTheme" Content="Создать тему" Grid.Row="2" Width="100" Margin="10" HorizontalAlignment="Left" Click="CreateNewTheme_Click"/>
+                    </Grid>
+                </ScrollViewer>
+            </Grid>
+
+            <Grid x:Name="EditThemeGrid" Grid.Column="1" Visibility="Hidden" Panel.ZIndex="1000" Background="{DynamicResource MainGridBrush}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <StackPanel Grid.Row="0" Margin="10">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Имя темы:" Margin="0,0,10,0" FontSize="14" Grid.Column="0" Foreground="{DynamicResource TextColorBrush}"/>
+                                <TextBox x:Name="ThemeName" Text="Новая тема" Width="100" Margin="0,0,10,0" FontSize="14" Grid.Column="1" CaretBrush="{DynamicResource TextColorBrush}" BorderBrush="{DynamicResource BorderColorBrush}" Foreground="{DynamicResource TextColorBrush}" Background="Transparent"/>
+                            </Grid>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="1" Margin="10">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Цвет текста:" Margin="0,0,10,0" FontSize="14" Grid.Column="0" Foreground="{DynamicResource TextColorBrush}"/>
+                                <xctk:ColorPicker x:Name="TextColorPicker" Grid.Column="1" Width="40" SelectedColorChanged="TextColorPicker_SelectedColorChanged"/>
+                            </Grid>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="2" Margin="10">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Цвет границ окна:" Margin="0,0,10,0" FontSize="14" Grid.Column="0" Foreground="{DynamicResource TextColorBrush}"/>
+                                <xctk:ColorPicker x:Name="WindowBorderColorPicker" Grid.Column="1" Width="40" SelectedColorChanged="WindowBorderColorPicker_SelectedColorChanged"/>
+                            </Grid>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="3" Margin="10">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Цвет границ:" Margin="0,0,10,0" FontSize="14" Grid.Column="0" Foreground="{DynamicResource TextColorBrush}"/>
+                                <xctk:ColorPicker x:Name="BorderBrushColorPicker" Grid.Column="1" Width="40" SelectedColorChanged="BorderBrushColorPicker_SelectedColorChanged"/>
+                            </Grid>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="4" Margin="10">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Цвет заднего фона:" Margin="0,0,10,0" FontSize="14" Grid.Column="0" Foreground="{DynamicResource TextColorBrush}"/>
+                                <xctk:ColorPicker x:Name="MainGridColorPicker" Grid.Column="1" Width="40" SelectedColorChanged="MainGridColorPicker_SelectedColorChanged"/>
+                            </Grid>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="5" Margin="10">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Цвет меню:" Margin="0,0,10,0" FontSize="14" Grid.Column="0" Foreground="{DynamicResource TextColorBrush}"/>
+                                <xctk:ColorPicker x:Name="SideMenuColorPicker" Grid.Column="1" Width="40" SelectedColorChanged="SideMenuColorPicker_SelectedColorChanged"/>
+                            </Grid>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="6" Margin="10">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Цвет заголовка окна:" Margin="0,0,10,0" FontSize="14" Grid.Column="0" Foreground="{DynamicResource TextColorBrush}"/>
+                                <xctk:ColorPicker x:Name="TitleBarColorPicker" Grid.Column="1" Width="40" SelectedColorChanged="TitleBarColorPicker_SelectedColorChanged"/>
+                            </Grid>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="7" Margin="10">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Цвет верхней панели:" Margin="0,0,10,0" FontSize="14" Grid.Column="0" Foreground="{DynamicResource TextColorBrush}"/>
+                                <xctk:ColorPicker x:Name="TopPanelColorPicker" Grid.Column="1" Width="40" SelectedColorChanged="TopPanelColorPicker_SelectedColorChanged"/>
+                            </Grid>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="8" Margin="10">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Цвет нижней панели:" Margin="0,0,10,0" FontSize="14" Grid.Column="0" Foreground="{DynamicResource TextColorBrush}"/>
+                                <xctk:ColorPicker x:Name="BottomPanelColorPicker" Grid.Column="1" Width="40" SelectedColorChanged="BottomPanelColorPicker_SelectedColorChanged"/>
+                            </Grid>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="9" Margin="10">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Цвет выделения:" Margin="0,0,10,0" FontSize="14" Grid.Column="0" Foreground="{DynamicResource TextColorBrush}"/>
+                                <xctk:ColorPicker x:Name="SelectPanelColorPicker" Grid.Column="1" Width="40" SelectedColorChanged="SelectPanelColorPicker_SelectedColorChanged"/>
+                            </Grid>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="10" Margin="10">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Цвет папок:" Margin="0,0,10,0" FontSize="14" Grid.Column="0" Foreground="{DynamicResource TextColorBrush}"/>
+                                <xctk:ColorPicker x:Name="FolderColorPicker" Grid.Column="1" Width="40" SelectedColorChanged="FolderColorPicker_SelectedColorChanged"/>
+                            </Grid>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="11" Margin="10">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Button x:Name="CreateTheme1" Content="Создать тему" Grid.Column="0" Width="100" Margin="10" HorizontalAlignment="Left" Click="CreateTheme_Click"/>
+                                <Button x:Name="CancelCreateTheme" Content="Отмена" Grid.Column="1" Width="100" Margin="10" HorizontalAlignment="Left" Click="CancelCreateTheme_Click"/>
+                            </Grid>
+                        </StackPanel>
+                    </Grid>
+                </ScrollViewer>
+            </Grid>
+
+            <Grid x:Name="SettingsGrid" Grid.Column="1" Visibility="Hidden" Panel.ZIndex="1000" Background="{DynamicResource MainGridBrush}">
+                <StackPanel Margin="10">
+                    <CheckBox x:Name="ShowFileExtensionsCheckBox" Content="Отображение расширений файлов" Foreground="{DynamicResource TextColorBrush}" Margin="0,5" Checked="ShowFileExtensionsCheckBox_Checked" Unchecked="ShowFileExtensionsCheckBox_Unchecked"/>
+                    <CheckBox x:Name="ShowHiddenFilesCheckBox" Content="Отображение скрытых файлов и папок" Foreground="{DynamicResource TextColorBrush}" Margin="0,5" Checked="ShowHiddenFilesCheckBox_Checked" Unchecked="ShowHiddenFilesCheckBox_Unchecked"/>
+                    <CheckBox x:Name="ShowSystemFilesCheckBox" Content="Отображение системных файлов и папок" Foreground="{DynamicResource TextColorBrush}" Margin="0,5" Checked="ShowSystemFilesCheckBox_Checked" Unchecked="ShowSystemFilesCheckBox_Unchecked"/>
+                    <CheckBox x:Name="EnablePreviewCheckBox" Content="Включить предпросмотр" Foreground="{DynamicResource TextColorBrush}" Margin="0,5" Checked="EnablePreviewCheckBox_Checked" Unchecked="EnablePreviewCheckBox_Unchecked"/>
+                    <CheckBox x:Name="ConfirmDeletionCheckBox" Content="Подтверждение удаления" Foreground="{DynamicResource TextColorBrush}" Margin="0,5" Checked="ConfirmDeletionCheckBox_Checked" Unchecked="ConfirmDeletionCheckBox_Unchecked"/>
+                    <CheckBox x:Name="OpenFilesWithSingleClickCheckBox" Content="Открывать файлы одним кликом" Foreground="{DynamicResource TextColorBrush}" Margin="0,5" Checked="OpenFilesWithSingleClickCheckBox_Checked" Unchecked="OpenFilesWithSingleClickCheckBox_Unchecked"/>
+                    <CheckBox x:Name="RememberWindowSizeCheckBox" Content="Запоминать размер и положение окна" Foreground="{DynamicResource TextColorBrush}" Margin="0,5" Checked="RememberWindowSizeCheckBox_Checked" Unchecked="RememberWindowSizeCheckBox_Unchecked"/>
+                    <!--<CheckBox x:Name="OpenLastActiveFolderCheckBox" Content="Открывать последнюю активную папку при запуске" Foreground="{DynamicResource TextColorBrush}" Margin="0,5" Checked="OpenLastActiveFolderCheckBox_Checked" Unchecked="OpenLastActiveFolderCheckBox_Unchecked"/>-->
+                </StackPanel>
+            </Grid>
+
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="*" x:Name="TabRow"/>
+                    <RowDefinition Height="0" x:Name="SplitterRow"/>
+                    <RowDefinition Height="0" x:Name="ConsoleRow"/>
+                    <RowDefinition Height="20"/>
+                </Grid.RowDefinitions>
+
+                <Border x:Name="Topper1" Grid.Column="1" Grid.Row="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="{DynamicResource TopPanelBrush}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!--<StackPanel x:Name="PathPanel1" Orientation="Horizontal" Grid.Column="1" Background="Transparent"/>-->
+                        <ScrollViewer x:Name="PathScrollViewer1" Grid.Column="1" Height="30" HorizontalScrollBarVisibility="Hidden" PreviewMouseDown="ScrollViewer_MouseDown" VerticalScrollBarVisibility="Disabled">
+                            <ScrollViewer.Template>
+                                <ControlTemplate TargetType="{x:Type ScrollViewer}">
+                                    <Border BorderBrush="{DynamicResource BorderColorBrush}" BorderThickness="1">
+                                        <Grid>
+                                            <ScrollContentPresenter />
+                                        </Grid>
+                                    </Border>
+                                </ControlTemplate>
+                            </ScrollViewer.Template>
+                            <ItemsControl x:Name="PathPanel1" Grid.Column="1" Height="30" Background="Transparent">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <!-- Кнопка с текстом именем папки, который обрезается, если он длинный -->
+                                            <Button Content="{Binding Name, Converter={StaticResource TextTrimConverter}, ConverterParameter=50}" 
+        Tag="{Binding FullPath}" 
+        Style="{StaticResource PathElementStyle}"
+        Click="PathElement_Click"/>
+                                            <TextBlock Text=">" Margin="2,0" VerticalAlignment="Center" Foreground="{DynamicResource TextColorBrush}"/> <!--Visibility="{Binding IsLast, Converter={StaticResource InverseBooleanConverter }, ConverterParameter=Inverse}"/>-->
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                        <TextBox x:Name="PathTextBox1" 
+             Grid.Column="1" 
+             Height="30" 
+             FontSize="16"
+             TextAlignment="Justify"
+             CaretBrush="{DynamicResource TextColorBrush}"
+             Foreground="{DynamicResource TextColorBrush}"
+             Background="Transparent"
+             Visibility="Collapsed" 
+             VerticalAlignment="Center" 
+             KeyDown="PathTextBox_KeyDown"
+             LostFocus="PathTextBox_LostFocus"/>
+                        <TextBox x:Name="Search1" TextAlignment="Justify" CaretBrush="{DynamicResource TextColorBrush}" FontSize="16" Grid.Column="2" Height="30" Background="Transparent" Foreground="{DynamicResource TextColorBrush}" BorderBrush="{DynamicResource BorderColorBrush}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="10,0,10,0" KeyDown="Search_KeyDown"/>
+                    </Grid>
+                </Border>
+                <local:CustomTabControl x:Name="TabControl1" Grid.Column="1" Grid.Row="1" Background="Transparent" BorderThickness="0,1,0,0" Drop="TabControl_Drop" AllowDrop="True" BorderBrush="{DynamicResource BorderColorBrush}"/>
+                <Canvas x:Name="SelectionCanvas" Grid.Column="1" Grid.Row="1" Panel.ZIndex="1000" Visibility="Hidden" IsHitTestVisible="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                <!--Background="Black" Opacity="0.5"-->
+                <Border x:Name="Border1" Grid.Column="1" Grid.Row="4" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="{DynamicResource BottomPanelBrush}" Margin="0,0,1.5,1.5">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock x:Name="Elements1" Grid.Column="0" Text="Элементов: 0" Foreground="{DynamicResource TextColorBrush}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,0,0,0"/>
+                            <TextBlock x:Name="SelectedElements1" Grid.Column="1" Text="Выбрано элементов: 0" Foreground="{DynamicResource TextColorBrush}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,0,0,0" Visibility="Hidden"/>
+                            <Button x:Name="OpenConsoleBtn" Content="^" Grid.Column="2" Click="ShowConsole_Click" HorizontalAlignment="Right" Width="30" Height="20" VerticalAlignment="Center" Background="Transparent" Foreground="{DynamicResource TextColorBrush}"/>
+                            <Button x:Name="OpenSecondListBtn" Content=">>" Grid.Column="3" Click="ShowSecondListBox_Click" HorizontalAlignment="Right" Width="30" Height="20" VerticalAlignment="Center" Background="Transparent" Foreground="{DynamicResource TextColorBrush}"/>
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <GridSplitter x:Name="ConsoleSplitter" Grid.Row="2" Height="2" 
+              HorizontalAlignment="Stretch" 
+              VerticalAlignment="Center"
+              Background="{DynamicResource BorderColorBrush}"
+              Visibility="{Binding ElementName=ConsoleBorder, Path=Visibility}" Panel.ZIndex="2000" DragCompleted="ConsoleSplitter_DragCompleted"/>
+                <Border x:Name="ConsoleBorder" Grid.Column="1" Grid.Row="3" 
+        VerticalAlignment="Stretch" HorizontalAlignment="Stretch" 
+        Background="Black" 
+        Margin="0,0,0,0" BorderBrush="{DynamicResource BorderBrush}" Visibility="Collapsed">
+                    <Border.RenderTransform>
+                        <TranslateTransform x:Name="ConsoleTranslate" Y="200"/>
+                    </Border.RenderTransform>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBox x:Name="ConsoleOutput" 
+                     IsReadOnly="True" Background="Transparent" 
+                     Foreground="Green" FontFamily="Consolas"
+                     TextWrapping="Wrap"
+                     VerticalScrollBarVisibility="Auto" BorderBrush="Transparent" PreviewMouseWheel="ConsoleOutput_PreviewMouseWheel"/>
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock x:Name="CurrentPathBlock" Grid.Column="0" 
+                       Text="{Binding ElementName=ActiveListBox, Path=CurrentPath}" 
+                       Foreground="White" VerticalAlignment="Center"/>
+                            <TextBox x:Name="ConsoleInput" Grid.Column="1" 
+                     Background="Transparent" Foreground="White" 
+                     FontFamily="Consolas" KeyDown="ConsoleInput_KeyDown" CaretBrush="White"/>
+                        </Grid>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <GridSplitter x:Name="Splitter" Grid.Column="2" Width="3" HorizontalAlignment="Stretch" Background="{DynamicResource BorderColorBrush}" Visibility="Hidden" DragCompleted="Splitter_DragCompleted"/>
+
+            <Grid Grid.Column="3">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="*" x:Name="TabRow2"/>
+                    <RowDefinition Height="0" x:Name="SplitterRow2"/>
+                    <RowDefinition Height="0" x:Name="ConsoleRow2"/>
+                    <RowDefinition Height="20"/>
+                </Grid.RowDefinitions>
+
+                <Border x:Name="Topper2" Grid.Column="1" Grid.Row="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="{DynamicResource TopPanelBrush}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!--<StackPanel x:Name="PathPanel2" Orientation="Horizontal" Grid.Column="1" Background="Transparent"/>-->
+                        <ScrollViewer x:Name="PathScrollViewer2" Grid.Column="1" Height="30" HorizontalScrollBarVisibility="Hidden" PreviewMouseDown="ScrollViewer_MouseDown" VerticalScrollBarVisibility="Disabled">
+                            <ScrollViewer.Template>
+                                <ControlTemplate TargetType="{x:Type ScrollViewer}">
+                                    <Border BorderBrush="{DynamicResource BorderColorBrush}" BorderThickness="1">
+                                        <Grid>
+                                            <ScrollContentPresenter />
+                                        </Grid>
+                                    </Border>
+                                </ControlTemplate>
+                            </ScrollViewer.Template>
+                            <ItemsControl x:Name="PathPanel2" Grid.Column="1" Height="30" Background="Transparent">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Button Content="{Binding Name, Converter={StaticResource TextTrimConverter}, ConverterParameter=50}" 
+Tag="{Binding FullPath}" 
+Style="{StaticResource PathElementStyle}"
+Click="PathElement_Click"/>
+                                            <TextBlock Text=">" Margin="2,0" VerticalAlignment="Center" Foreground="{DynamicResource TextColorBrush}"/> <!--Visibility="{Binding IsLast, Converter={StaticResource InverseBooleanConverter }, ConverterParameter=Inverse}"/>-->
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                        <TextBox x:Name="PathTextBox2" 
+     Grid.Column="1" 
+     Height="30" 
+     FontSize="16"
+     TextAlignment="Justify"
+     CaretBrush="{DynamicResource TextColorBrush}"
+     Foreground="{DynamicResource TextColorBrush}"
+     Background="Transparent"
+     Visibility="Collapsed" 
+     VerticalAlignment="Center" 
+     KeyDown="PathTextBox_KeyDown"
+     LostFocus="PathTextBox_LostFocus"/>
+                        <TextBox x:Name="Search2" TextAlignment="Justify" CaretBrush="{DynamicResource TextColorBrush}" FontSize="16" Grid.Column="2" Height="30" Background="Transparent" Foreground="{DynamicResource TextColorBrush}" BorderBrush="{DynamicResource BorderColorBrush}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="10,0,10,0" KeyDown="Search2_KeyDown"/>
+                    </Grid>
+                </Border>
+                <local:CustomTabControl x:Name="TabControl2" Grid.Column="1" Grid.Row="1" Background="Transparent" Visibility="Collapsed" BorderThickness="0,1,0,0" Drop="TabControl_Drop" AllowDrop="True" BorderBrush="{DynamicResource BorderColorBrush}"/>
+                <Canvas x:Name="SelectionCanvas2" Grid.Column="1" Grid.Row="1" Panel.ZIndex="1000" Visibility="Hidden" IsHitTestVisible="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                <!--Background="Black" Opacity="0.5"-->
+                <Border x:Name="Border2" Grid.Column="1" Grid.Row="4" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="{DynamicResource BottomPanelBrush}" Margin="0,0,1.5,1.5">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock x:Name="Elements2" Grid.Column="0" Text="Элементов: 0" Foreground="{DynamicResource TextColorBrush}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,0,0,0"/>
+                            <TextBlock x:Name="SelectedElements2" Grid.Column="1" Text="Выбрано элементов: 0" Foreground="{DynamicResource TextColorBrush}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,0,0,0" Visibility="Hidden"/>
+                            <Button x:Name="OpenConsoleBtn2" Content="^" Grid.Column="2" Click="ShowConsole2_Click" HorizontalAlignment="Right" Width="30" Height="20" VerticalAlignment="Center" Background="Transparent" Foreground="{DynamicResource TextColorBrush}"/>
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <GridSplitter x:Name="ConsoleSplitter2" Grid.Row="2" Height="2" 
+      HorizontalAlignment="Stretch" 
+      VerticalAlignment="Center"
+      Background="{DynamicResource BorderColorBrush}"
+      Visibility="{Binding ElementName=ConsoleBorder2, Path=Visibility}" Panel.ZIndex="1000" DragCompleted="ConsoleSplitter2_DragCompleted"/>
+                <Border x:Name="ConsoleBorder2" Grid.Column="1" Grid.Row="3" 
+VerticalAlignment="Stretch" HorizontalAlignment="Stretch" 
+Background="Black" 
+Margin="0,0,0,0" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" Visibility="Collapsed">
+                    <Border.RenderTransform>
+                        <TranslateTransform x:Name="ConsoleTranslate2" Y="200"/>
+                    </Border.RenderTransform>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBox x:Name="ConsoleOutput2" 
+             IsReadOnly="True" Background="Transparent" 
+             Foreground="Green" FontFamily="Consolas"
+             TextWrapping="Wrap"
+             VerticalScrollBarVisibility="Auto" BorderBrush="Transparent" PreviewMouseWheel="ConsoleOutput_PreviewMouseWheel"/>
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock x:Name="CurrentPathBlock2" Grid.Column="0" 
+               Text="{Binding ElementName=ActiveListBox2, Path=CurrentPath}" 
+               Foreground="White" VerticalAlignment="Center"/>
+                            <TextBox x:Name="ConsoleInput2" Grid.Column="1" 
+             Background="Transparent" Foreground="White" 
+             FontFamily="Consolas" KeyDown="ConsoleInput2_KeyDown" CaretBrush="White"/>
+                        </Grid>
+                    </Grid>
+                </Border>
+            </Grid>
+
+        </Grid>
+        <!--<Border CornerRadius="10" Background="Transparent" IsHitTestVisible="False" BorderThickness="1" BorderBrush="{DynamicResource WindowBorderColorBrush}">
+
+        </Border>-->
+    </Grid>
+</Window>

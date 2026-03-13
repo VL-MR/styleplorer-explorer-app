@@ -1,0 +1,165 @@
+﻿<Application x:Class="Styleplorer.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:Styleplorer"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        
+        
+        <Style x:Key="CustomListBoxStyle" TargetType="{x:Type local:CustomListView}">
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="VerticalAlignment" Value="Stretch"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
+            <Setter Property="VerticalContentAlignment" Value="Top"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="SelectionMode" Value="Extended"/>
+            <Setter Property="AllowDrop" Value="True"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            
+            <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True"/>
+            <Setter Property="VirtualizingPanel.VirtualizationMode" Value="Standard"/>
+            <Setter Property="ScrollViewer.CanContentScroll" Value="True"/>
+            
+            <Setter Property="ItemContainerStyle">
+                <Setter.Value>
+                    <Style TargetType="{x:Type ListBoxItem}">
+                        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                    </Style>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="ItemsPanel">
+                <Setter.Value>
+                    <ItemsPanelTemplate>
+                        <local:VirtualizingWrapPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="{x:Type local:CustomTabControl}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type local:CustomTabControl}">
+                        <Grid KeyboardNavigation.TabNavigation="Local">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Border x:Name="HeaderBorder" Grid.Row="0" Background="Transparent">
+                                <StackPanel x:Name="HeaderPanel" IsItemsHost="True" Orientation="Horizontal"/>
+                            </Border>
+                            <Border x:Name="ContentBorder" Grid.Row="1" Background="{TemplateBinding Background}" 
+                            BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                                <ContentPresenter x:Name="PART_SelectedContentHost" ContentSource="SelectedContent"/>
+                            </Border>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+
+        <DataTemplate x:Key="IconAndNameColumnTemplate">
+            <StackPanel Orientation="Horizontal">
+                <Image Source="{Binding Icon}" Width="24" Height="24" Margin="0,0,5,0"/>
+                <TextBlock Text="{Binding Name}" VerticalAlignment="Center" 
+                   HorizontalAlignment="Center" TextAlignment="Center"/>
+            </StackPanel>
+        </DataTemplate>
+
+        <DataTemplate x:Key="SizeColumnTemplate">
+            <TextBlock Text="{Binding FormattedSize}" TextAlignment="Center"/>
+        </DataTemplate>
+
+        <DataTemplate x:Key="TypeColumnTemplate">
+            <TextBlock Text="{Binding Type}" TextAlignment="Center"/>
+        </DataTemplate>
+
+        <DataTemplate x:Key="DateColumnTemplate">
+            <TextBlock Text="{Binding DateChanged, StringFormat={}{0:dd.MM.yyyy HH:mm}}" 
+               HorizontalAlignment="Center" TextAlignment="Center"/>
+        </DataTemplate>
+
+        <GridView x:Key="TableViewGridView">
+            <GridView.ColumnHeaderContainerStyle>
+                <Style TargetType="GridViewColumnHeader">
+                    <Setter Property="Background" Value="Transparent"/>
+                    <Setter Property="Foreground" Value="White"/>
+                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                </Style>
+            </GridView.ColumnHeaderContainerStyle>
+            <GridViewColumn Header="Имя" CellTemplate="{StaticResource IconAndNameColumnTemplate}"/>
+            <GridViewColumn Header="Размер" CellTemplate="{StaticResource SizeColumnTemplate}"/>
+            <GridViewColumn Header="Тип" CellTemplate="{StaticResource TypeColumnTemplate}"/>
+            <GridViewColumn Header="Дата изменения" CellTemplate="{StaticResource DateColumnTemplate}"/>
+        </GridView>
+
+
+
+        <Style x:Key="ScrollBarButtonStyle" TargetType="{x:Type RepeatButton}">
+            <Setter Property="OverridesDefaultStyle" Value="true"/>
+            <Setter Property="Focusable" Value="false"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type RepeatButton}">
+                        <Border Background="#FF444444" BorderBrush="#FF666666" BorderThickness="1">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="{x:Type ScrollBar}">
+            <Setter Property="Background" Value="#FF333333"/>
+            <Setter Property="Foreground" Value="#FFFFFFFF"/>
+            <Setter Property="Width" Value="16"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ScrollBar}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <RepeatButton Grid.Row="0" Style="{StaticResource ScrollBarButtonStyle}" 
+                                      Command="ScrollBar.LineUpCommand" Height="16">
+                                <Path Fill="{TemplateBinding Foreground}" Data="M 0 4 L 8 4 L 4 0 Z"/>
+                            </RepeatButton>
+
+                            <Track Name="PART_Track" Grid.Row="1" IsDirectionReversed="true">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Command="ScrollBar.PageUpCommand" Style="{StaticResource ScrollBarButtonStyle}"/>
+                                </Track.DecreaseRepeatButton>
+                                <Track.Thumb>
+                                    <Thumb>
+                                        <Thumb.Template>
+                                            <ControlTemplate TargetType="{x:Type Thumb}">
+                                                <Rectangle Fill="#FF666666" RadiusX="3" RadiusY="3"/>
+                                            </ControlTemplate>
+                                        </Thumb.Template>
+                                    </Thumb>
+                                </Track.Thumb>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Command="ScrollBar.PageDownCommand" Style="{StaticResource ScrollBarButtonStyle}"/>
+                                </Track.IncreaseRepeatButton>
+                            </Track>
+
+                            <RepeatButton Grid.Row="2" Style="{StaticResource ScrollBarButtonStyle}" 
+                                      Command="ScrollBar.LineDownCommand" Height="16">
+                                <Path Fill="{TemplateBinding Foreground}" Data="M 0 0 L 4 4 L 8 0 Z"/>
+                            </RepeatButton>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!--<Color x:Key="RectangleFillColor">#4034B4FA</Color>-->
+    </Application.Resources>
+</Application>

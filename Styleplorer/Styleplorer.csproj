@@ -1,0 +1,80 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net7.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\AnotherLogo.png" />
+    <None Remove="Resources\BigLogo.png" />
+    <None Remove="Resources\DropBoxLogo.png" />
+    <None Remove="Resources\FolderInsideFolder.jpg" />
+    <None Remove="Resources\GroupFolderIcon.png" />
+    <None Remove="Resources\KingSpec M2.jpg" />
+    <None Remove="Resources\KingSpec M2.png" />
+    <None Remove="Resources\KingSpec SATA.jpg" />
+    <None Remove="Resources\KingSpec SATA.png" />
+    <None Remove="Resources\MiniLogo.png" />
+    <None Remove="Resources\SSD SATA.png" />
+    <None Remove="Resources\StandartFolder.jpg" />
+    <None Remove="Resources\StandartFolder1.jpg" />
+    <None Remove="Resources\StandartFolder1.png" />
+    <None Remove="Resources\StandartFolder2.jpg" />
+    <None Remove="Resources\StandartFolder2.png" />
+    <None Remove="Resources\TOSHIBA.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <COMReference Include="Shell32">
+      <WrapperTool>tlbimp</WrapperTool>
+      <VersionMinor>0</VersionMinor>
+      <VersionMajor>1</VersionMajor>
+      <Guid>50a7e9b0-70ef-11d1-b75a-00a0c90564fe</Guid>
+      <Lcid>0</Lcid>
+      <Isolated>false</Isolated>
+      <EmbedInteropTypes>true</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AvalonEdit" Version="6.3.0.90" />
+    <PackageReference Include="Dropbox.API" Version="7.0.0" />
+    <PackageReference Include="Extended.Wpf.Toolkit" Version="4.6.1" />
+    <PackageReference Include="IconLib" Version="0.74.3" />
+    <PackageReference Include="ksemenenko.ColorThief" Version="1.1.1.4" />
+    <PackageReference Include="MediaToolkit" Version="1.1.0.1" />
+    <PackageReference Include="MvvmLightLibs" Version="5.4.1.1" />
+    <PackageReference Include="SharpCompress" Version="0.38.0" />
+    <PackageReference Include="SkiaSharp" Version="2.88.8" />
+    <PackageReference Include="System.Drawing.Common" Version="8.0.10" />
+    <PackageReference Include="System.Management" Version="8.0.0" />
+    <PackageReference Include="System.Runtime.Caching" Version="8.0.1" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
+    <PackageReference Include="VirtualizingWrapPanel" Version="2.0.11" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\BigLogo.png" />
+    <Resource Include="Resources\DropBoxLogo.png" />
+    <Resource Include="Resources\FolderInsideFolder.jpg" />
+    <Resource Include="Resources\GroupFolderIcon.png" />
+    <Resource Include="Resources\KingSpec M2.jpg" />
+    <Resource Include="Resources\KingSpec SATA.jpg" />
+    <Resource Include="Resources\MiniLogo.png" />
+    <Resource Include="Resources\SSD SATA.png" />
+    <Resource Include="Resources\StandartFolder.jpg" />
+    <Resource Include="Resources\StandartFolder1.jpg" />
+    <Resource Include="Resources\StandartFolder2.jpg" />
+    <Resource Include="Resources\AnotherLogo.png" />
+    <Resource Include="Resources\TOSHIBA.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="GroupImages\" />
+  </ItemGroup>
+
+</Project>
