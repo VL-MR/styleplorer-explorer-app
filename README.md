@@ -1,7 +1,9 @@
-# Styleplorer (Flexplorer)
+# Styleplorer
 
 Кастомный файловый проводник для Windows, разработанный на WPF.
 Проект предоставляет базовый функционал стандартного проводника Windows и дополнительные возможности настройки интерфейса.
+
+<img width="1920" height="1080" alt="Screen4" src="https://github.com/user-attachments/assets/71ede69f-51cf-4a56-bf2b-12151ca6f4c8" />
 
 ## Технологии
 
