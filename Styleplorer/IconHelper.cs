@@ -563,6 +563,10 @@ namespace Styleplorer
 
         public static BitmapSource GetSmallestExeIcon(string path)
         {
+            if (path == null)
+            {
+                return null;
+            }
             if (path.ToLower().EndsWith(".exe"))
             {
                 SHFILEINFO shinfo = new SHFILEINFO();
